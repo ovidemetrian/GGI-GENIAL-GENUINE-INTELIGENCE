@@ -1,0 +1,1290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="description" content="GGI Comparison Mode - Compare responses from multiple AI models under unified governance"/>
+<meta name="author" content="Media Content Delivery, LLC - Ovidiu Mircea Demetrian"/>
+<title>GGI Control Panel — COMPARISON MODE (xAI + GGI v2)</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<style>
+/* === CORE VARIABLES === */
+:root {
+  --bg: #0f0f11; 
+  --panel-bg: linear-gradient(145deg, #1a1a1a, #0e0e0e);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-highlight: rgba(255, 255, 255, 0.1);
+  --section-bg: #161616;
+  --section-shadow: inset 1px 1px 2px rgba(0,0,0,0.6), inset -1px -1px 2px rgba(255,255,255,0.03);
+  --text-main: #e2e2e2;
+  --text-muted: #888888;
+  --text-input: #ffffff;
+  --meh: #450a0a; --meh2: #991b1b;
+  --but: #b45309; --but2: #fbbf24; 
+  --aha: #172554; --aha2: #1e40af;
+  --pam: #14532d; --pam2: #22c55e;
+  --input-bg: #0a0a0a;
+  --input-border: #333;
+  --glow-color: rgba(56, 189, 248, 0.5);
+  --neural-bg: #0b0f15;
+  --neural-border: #2563eb;
+  --neural-text: #60a5fa;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text-main);
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 12px; overflow-x: hidden;
+  user-select: none; -webkit-user-select: none;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.wrap { max-width: 1200px; margin: 0 auto; opacity: 0; transition: opacity 0.8s ease; }
+
+#bootScreen {
+  position: fixed; inset: 0; z-index: 10000;
+  background: #0a0a0a; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: monospace; color: #22c55e;
+}
+.boot-bar-wrap { width: 280px; height: 4px; background: #222; margin-top: 15px; border-radius: 2px; border: 1px solid #444; }
+.boot-bar-fill { height: 100%; background: #22c55e; width: 0%; box-shadow: 0 0 10px #22c55e; }
+
+.title {
+  font-size: clamp(22px, 5vw, 32px); font-weight: 900; text-align: center; margin-bottom: 4px;
+  background: linear-gradient(90deg, #ef4444, #fbbf24, #3b82f6, #ef4444);
+  -webkit-background-clip: text; color: transparent; background-size: 300%;
+  animation: neonshift 15s linear infinite; letter-spacing: 2px; text-transform: uppercase;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+@keyframes neonshift { 0% { background-position: 0% } 100% { background-position: 200% } }
+
+.company-line { 
+  text-align: center; font-size: 10px; opacity: 0.8; letter-spacing: 1.5px; 
+  color: var(--text-muted); text-transform: uppercase; font-weight: 600;
+}
+.subGGI { 
+  text-align: center; font-size: 12px; letter-spacing: 3px; color: var(--text-muted); 
+  text-transform: uppercase; margin-bottom: 12px; font-weight: 500;
+}
+
+button {
+  cursor: pointer; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; 
+  color: #fff; font-weight: 600;
+  transition: transform 0.05s, box-shadow 0.1s, filter 0.1s;
+  position: relative; overflow: hidden; touch-action: manipulation; 
+  font-family: inherit; text-transform: uppercase; letter-spacing: 0.5px;
+}
+button:active { transform: translateY(1px); filter: brightness(0.9); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--glass-border);
+  border-top: 1px solid var(--glass-highlight);
+  border-radius: 8px; padding: 16px; 
+  box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.section {
+  background: var(--section-bg); 
+  box-shadow: var(--section-shadow);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-top: 1px solid rgba(255,255,255,0.1); 
+  border-radius: 6px; padding: 12px;
+}
+
+.section h3 { 
+  margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; 
+  border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px; 
+  background: linear-gradient(90deg, #ef4444, #fbbf24, #3b82f6, #ef4444);
+  -webkit-background-clip: text; color: transparent; background-size: 300%;
+  animation: neonshift 15s linear infinite;
+}
+
+/* === GGI CONTROL PANEL (TOP STRIP) === */
+.ggi-panel {
+  margin: 10px 0 18px;
+  background: radial-gradient(circle at top left, rgba(34,197,94,0.12), transparent),
+              radial-gradient(circle at bottom right, rgba(59,130,246,0.12), transparent),
+              #050505;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ggi-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ggi-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+}
+.ggi-powered {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #facc15;
+}
+
+.ggi-main-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ggi-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ggi-btn {
+  min-width: 70px;
+  padding: 6px 10px;
+  font-size: 10px;
+  border-radius: 999px;
+  border-width: 1px;
+  text-align: center;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.6);
+}
+.ggi-btn span {
+  font-weight: 800;
+  margin-right: 4px;
+}
+
+.ggi-btn.meh { 
+  background: linear-gradient(to bottom, var(--meh2), var(--meh)); 
+  border-color: #7f1d1d;
+}
+.ggi-btn.but { 
+  background: linear-gradient(to bottom, var(--but2), var(--but)); 
+  border-color: #92400e;
+}
+.ggi-btn.aha { 
+  background: linear-gradient(to bottom, var(--aha2), var(--aha)); 
+  border-color: #1d4ed8;
+}
+.ggi-btn.pam { 
+  background: linear-gradient(to bottom, var(--pam2), var(--pam)); 
+  border-color: #16a34a;
+}
+
+.ggi-btn.active {
+  box-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
+  outline: 1px solid rgba(250, 250, 250, 0.4);
+}
+
+.ggi-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 140px;
+}
+.ggi-meta-line {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+.ggi-meta-value {
+  color: #e5e5e5;
+}
+
+/* === NEURAL COMPARISON SECTION === */
+.neural-link-card {
+  background: linear-gradient(145deg, #0b0f15, #050505);
+  border: 1px solid var(--neural-border);
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.1);
+  margin-bottom: 20px;
+}
+
+/* AI Selection Grid */
+.ai-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ai-checkbox-card {
+  padding: 12px;
+  background: rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.ai-checkbox-card:hover {
+  border-color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.05);
+}
+
+.ai-checkbox-card.selected {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+}
+
+.ai-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #22c55e;
+  cursor: pointer;
+}
+
+.ai-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-main);
+  flex: 1;
+}
+
+.ai-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #555;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.ai-checkbox-card.selected .ai-status-dot {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Input Area */
+textarea {
+  width: 100%; 
+  padding: 12px; 
+  border-radius: 4px; 
+  margin-top: 4px;
+  background: var(--input-bg); 
+  border: 1px solid var(--input-border); 
+  color: var(--text-input);
+  outline: none; 
+  transition: all 0.2s; 
+  font-family: inherit; 
+  font-size: 13px;
+  resize: vertical; 
+  min-height: 80px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+
+textarea:focus { 
+  border-color: #3b82f6; 
+  box-shadow: 0 0 0 2px var(--glow-color); 
+}
+
+/* Action Buttons */
+.neural-actions { 
+  display: flex; 
+  gap: 8px; 
+  margin-top: 10px; 
+  flex-wrap: wrap;
+}
+
+.btn-neural {
+  padding: 12px; 
+  font-size: 11px; 
+  border-radius: 4px; 
+  flex: 1;
+  min-width: 140px;
+  background: linear-gradient(to bottom, #2563eb, #1e3a8a); 
+  border: 1px solid #60a5fa;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.3); 
+  text-transform: uppercase; 
+  letter-spacing: 1px; 
+  font-weight: 700; 
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-neural:active:not(:disabled) { 
+  transform: translateY(1px); 
+  box-shadow: 0 1px 0 rgba(0,0,0,0.3); 
+}
+
+.btn-compare {
+  background: linear-gradient(to bottom, #22c55e, #15803d);
+  border-color: #4ade80;
+}
+
+/* === COMPARISON RESULTS === */
+.comparison-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.ai-response-card {
+  background: var(--section-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.ai-response-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.ai-name {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-badge {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+}
+
+.ai-response-time {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.ai-response-body {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-main);
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.ai-response-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ai-response-body::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+.ai-response-body::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+}
+
+.ai-response-footer {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rating-btn {
+  padding: 4px 8px;
+  font-size: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rating-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-main);
+}
+
+.rating-btn.selected {
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #fff;
+}
+
+/* Loading States */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--text-muted);
+  flex-direction: column;
+  gap: 12px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: #22c55e;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Stats Panel */
+.comparison-stats {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-main);
+  font-family: monospace;
+}
+
+/* API Key Input */
+.api-key-section {
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.api-key-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #eab308;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.api-input {
+  width: 100%;
+  padding: 8px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  color: var(--text-input);
+  font-family: monospace;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.api-input:focus {
+  outline: none;
+  border-color: #eab308;
+  box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.quick-action-chip {
+  padding: 4px 10px;
+  font-size: 10px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  color: #60a5fa;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.quick-action-chip:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Winner Badge */
+.winner-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #000;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 8px rgba(251, 191, 36, 0.4);
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Export Button */
+.btn-export {
+  background: linear-gradient(to bottom, #8b5cf6, #6d28d9);
+  border-color: #a78bfa;
+}
+
+/* Notification Toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: white;
+  font-size: 13px;
+  z-index: 9999;
+  animation: slideIn 0.3s ease;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.toast.success { border-color: #22c55e; }
+.toast.error { border-color: #ef4444; }
+.toast.warning { border-color: #eab308; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body { padding: 8px; }
+  .panel { padding: 12px; }
+  .ggi-panel { padding: 8px; }
+  .title { font-size: 20px; }
+  .comparison-container {
+    grid-template-columns: 1fr;
+  }
+  .ggi-meta {
+    min-width: 100%;
+    align-items: flex-start;
+  }
+  .neural-actions {
+    flex-direction: column;
+  }
+  .btn-neural {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+<div id="bootScreen">
+  <div style="font-size:12px; margin-bottom:10px; opacity:0.8; font-weight:700; letter-spacing:2px;">GGI COMPARISON MODE (xAI + GGI v2)</div>
+  <div class="boot-bar-wrap"><div class="boot-bar-fill" id="bootBar"></div></div>
+</div>
+
+<div class="wrap" id="mainWrap">
+  <header>
+    <div class="company-line">MEDIA CONTENT DELIVERY, LLC © OVIDIU MIRCEA DEMETRIAN — 2025</div>
+    <div class="title">🧬 AI COMPARISON MODE</div>
+    <div class="subGGI">QUERY MULTIPLE AIs • COMPARE RESPONSES • GGI GOVERNANCE ACTIVE</div>
+  </header>
+
+  <!-- ==== GGI CONTROL PANEL STRIP (INFLUENCES ALL AIs) ==== -->
+  <div class="ggi-panel">
+    <div class="ggi-header-row">
+      <div class="ggi-title">GGI CONTROL PANEL — HUMAN • A.I. INTERFACE</div>
+      <div class="ggi-powered">Powered by Stewardship OS · 10 Laws of A.I.</div>
+    </div>
+    <div class="ggi-main-row">
+      <div class="ggi-buttons">
+        <button type="button" class="ggi-btn meh" id="btnGGIMeh">
+          <span>MEH</span>Safe · Minimal · Low-heat
+        </button>
+        <button type="button" class="ggi-btn but" id="btnGGIBut">
+          <span>BUT</span>Critical · Devil's Advocate
+        </button>
+        <button type="button" class="ggi-btn aha" id="btnGGIAha">
+          <span>AHA</span>Insight · Clarity Mode
+        </button>
+        <button type="button" class="ggi-btn pam" id="btnGGIPam">
+          <span>PAM</span>Creative · Playful · Wide
+        </button>
+      </div>
+      <div class="ggi-meta">
+        <div class="ggi-meta-line">
+          MODE: <span class="ggi-meta-value" id="ggiModeLabel">AHA — Insight & Clarity</span>
+        </div>
+        <div class="ggi-meta-line">
+          TEMP: <span class="ggi-meta-value" id="ggiTempLabel">0.35</span> · LOOP GUARD: ON
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="section neural-link-card">
+      <h3>⚡ NEURAL COMPARISON ENGINE</h3>
+
+      <div class="api-key-section">
+        <div class="api-key-title">⚠️ API Keys Required (Stored Locally)</div>
+        <div style="font-size: 10px; color: #f5f5f5; margin-bottom: 8px;">
+          Keys are encrypted and stored in your browser. Never sent to our servers. Get keys from official providers.
+        </div>
+        <input type="password" class="api-input" id="geminiKey" placeholder="Gemini API Key (get from ai.google.dev)">
+        <input type="password" class="api-input" id="openaiKey" placeholder="OpenAI API Key (starts with sk-...)">
+        <input type="password" class="api-input" id="anthropicKey" placeholder="Anthropic API Key (starts with sk-ant-...)">
+        <input type="password" class="api-input" id="xaiKey" placeholder="xAI Grok API Key (starts with xai-...)">
+      </div>
+
+      <div id="aiSelectionSection">
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 1px;">
+          Select AIs to Compare:
+        </div>
+        <div class="ai-selection-grid">
+          <label class="ai-checkbox-card selected" data-ai="gemini">
+            <input type="checkbox" class="ai-checkbox" value="gemini" checked>
+            <span class="ai-label">Gemini 2.0</span>
+            <div class="ai-status-dot"></div>
+          </label>
+          <label class="ai-checkbox-card" data-ai="chatgpt">
+            <input type="checkbox" class="ai-checkbox" value="chatgpt">
+            <span class="ai-label">ChatGPT</span>
+            <div class="ai-status-dot"></div>
+          </label>
+          <label class="ai-checkbox-card" data-ai="claude">
+            <input type="checkbox" class="ai-checkbox" value="claude">
+            <span class="ai-label">Claude</span>
+            <div class="ai-status-dot"></div>
+          </label>
+          <label class="ai-checkbox-card" data-ai="grok">
+            <input type="checkbox" class="ai-checkbox" value="grok">
+            <span class="ai-label">Grok (xAI)</span>
+            <div class="ai-status-dot"></div>
+          </label>
+        </div>
+      </div>
+
+      <textarea id="queryInput" placeholder="ENTER YOUR QUERY... (e.g., 'Explain quantum computing in simple terms')"></textarea>
+
+      <div class="quick-actions">
+        <span class="quick-action-chip" onclick="setQuery('Explain quantum computing in simple terms')">🔬 Quantum</span>
+        <span class="quick-action-chip" onclick="setQuery('Write a Python function to sort a list')">💻 Code</span>
+        <span class="quick-action-chip" onclick="setQuery('What are the best productivity tips?')">⚡ Productivity</span>
+        <span class="quick-action-chip" onclick="setQuery('Explain the meaning of life')">🤔 Philosophy</span>
+        <span class="quick-action-chip" onclick="setQuery('Compare pros and cons of renewable energy')">🌍 Analysis</span>
+      </div>
+
+      <div class="neural-actions">
+        <button id="btnCompare" class="btn-neural btn-compare">
+          🚀 COMPARE RESPONSES (GGI ACTIVE)
+        </button>
+        <button id="btnExport" class="btn-neural btn-export">
+          📥 EXPORT RESULTS
+        </button>
+        <button id="btnClear" class="btn-neural" style="background: linear-gradient(to bottom, #dc2626, #991b1b); border-color: #ef4444;">
+          🗑️ CLEAR
+        </button>
+      </div>
+    </div>
+
+    <div id="statsSection" style="display: none;">
+      <div class="section">
+        <div class="comparison-stats">
+          <div class="stat-item">
+            <div class="stat-label">AIs Queried</div>
+            <div class="stat-value" id="statAIs">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Avg Response Time</div>
+            <div class="stat-value" id="statTime">0.0s</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Total Tokens</div>
+            <div class="stat-value" id="statTokens">~0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Winner</div>
+            <div class="stat-value" id="statWinner">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultsContainer" class="section" style="display: none;">
+      <h3>📊 COMPARISON RESULTS</h3>
+      <div id="resultsGrid" class="comparison-container"></div>
+    </div>
+
+    <div id="emptyState" class="section">
+      <div class="empty-state">
+        <div class="empty-state-icon">🤖</div>
+        <div class="empty-state-text">
+          <strong>Welcome to AI Comparison Mode · GGI v2</strong><br>
+          Pick a GGI mode (Meh / But / Aha / Pam), select AIs above, enter your query,<br>
+          and click "COMPARE RESPONSES" to see how different models behave under the same governance.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// === STATE MANAGEMENT ===
+const STATE = {
+  mode: 'compare',
+  selectedAIs: ['gemini'],
+  results: [],
+  apiKeys: {
+    gemini: '',
+    openai: '',
+    anthropic: '',
+    xai: ''
+  }
+};
+
+// === GGI STATE (GLOBAL GOVERNANCE) ===
+const GGI = {
+  mode: 'AHA',
+  temp: 0.35,
+  systemPrefix: 'You are an AI assistant operating under GGI (Genial Genuine Intelligence). Respect human time, avoid loops, be clear, and surface one key insight.'
+};
+
+// === UTILITY FUNCTIONS ===
+const $ = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
+
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// === GGI CONTROL PANEL LOGIC ===
+function applyGGIProfile(mode) {
+  GGI.mode = mode;
+  switch(mode) {
+    case 'MEH':
+      GGI.temp = 0.15;
+      GGI.systemPrefix = 'You are an AI assistant operating in MEH mode under GGI. Be brief, conservative, low-heat. Answer only what is asked, avoid speculation, and say when you do not know.';
+      $('ggiModeLabel').textContent = 'MEH — Safe & Minimal';
+      break;
+    case 'BUT':
+      GGI.temp = 0.4;
+      GGI.systemPrefix = 'You are an AI assistant operating in BUT mode under GGI. Act as a respectful devil\'s advocate: surface risks, downsides, edge cases, and contradictions while staying constructive.';
+      $('ggiModeLabel').textContent = 'BUT — Critical Reflection';
+      break;
+    case 'PAM':
+      GGI.temp = 0.8;
+      GGI.systemPrefix = 'You are an AI assistant operating in PAM mode under GGI. Be creative, playful and expansive, but still truthful. Use humor lightly, respect human time, and avoid useless loops.';
+      $('ggiModeLabel').textContent = 'PAM — Creative & Playful';
+      break;
+    case 'AHA':
+    default:
+      GGI.temp = 0.35;
+      GGI.systemPrefix = 'You are an AI assistant operating in AHA mode under GGI. Focus on clarity, structure and one big useful insight. Avoid rambling and repetition.';
+      $('ggiModeLabel').textContent = 'AHA — Insight & Clarity';
+      break;
+  }
+  $('ggiTempLabel').textContent = GGI.temp.toFixed(2);
+
+  $$('.ggi-btn').forEach(btn => btn.classList.remove('active'));
+  if (mode === 'MEH') $('btnGGIMeh').classList.add('active');
+  if (mode === 'BUT') $('btnGGIBut').classList.add('active');
+  if (mode === 'AHA') $('btnGGIAha').classList.add('active');
+  if (mode === 'PAM') $('btnGGIPam').classList.add('active');
+}
+
+$('btnGGIMeh').addEventListener('click', () => applyGGIProfile('MEH'));
+$('btnGGIBut').addEventListener('click', () => applyGGIProfile('BUT'));
+$('btnGGIAha').addEventListener('click', () => applyGGIProfile('AHA'));
+$('btnGGIPam').addEventListener('click', () => applyGGIProfile('PAM'));
+
+applyGGIProfile('AHA');
+
+// === API KEY MANAGEMENT ===
+$('geminiKey').addEventListener('input', (e) => {
+  STATE.apiKeys.gemini = e.target.value;
+  localStorage.setItem('ggi_gemini_key', btoa(e.target.value));
+});
+
+$('openaiKey').addEventListener('input', (e) => {
+  STATE.apiKeys.openai = e.target.value;
+  localStorage.setItem('ggi_openai_key', btoa(e.target.value));
+});
+
+$('anthropicKey').addEventListener('input', (e) => {
+  STATE.apiKeys.anthropic = e.target.value;
+  localStorage.setItem('ggi_anthropic_key', btoa(e.target.value));
+});
+
+$('xaiKey').addEventListener('input', (e) => {
+  STATE.apiKeys.xai = e.target.value;
+  localStorage.setItem('ggi_xai_key', btoa(e.target.value));
+});
+
+window.addEventListener('load', () => {
+  try {
+    STATE.apiKeys.gemini = localStorage.getItem('ggi_gemini_key') ? atob(localStorage.getItem('ggi_gemini_key')) : '';
+    STATE.apiKeys.openai = localStorage.getItem('ggi_openai_key') ? atob(localStorage.getItem('ggi_openai_key')) : '';
+    STATE.apiKeys.anthropic = localStorage.getItem('ggi_anthropic_key') ? atob(localStorage.getItem('ggi_anthropic_key')) : '';
+    STATE.apiKeys.xai = localStorage.getItem('ggi_xai_key') ? atob(localStorage.getItem('ggi_xai_key')) : '';
+    
+    if (STATE.apiKeys.gemini) $('geminiKey').value = STATE.apiKeys.gemini;
+    if (STATE.apiKeys.openai) $('openaiKey').value = STATE.apiKeys.openai;
+    if (STATE.apiKeys.anthropic) $('anthropicKey').value = STATE.apiKeys.anthropic;
+    if (STATE.apiKeys.xai) $('xaiKey').value = STATE.apiKeys.xai;
+  } catch (e) {
+    console.error('Error loading API keys:', e);
+  }
+});
+
+// === AI SELECTION ===
+$$('.ai-checkbox').forEach(checkbox => {
+  checkbox.addEventListener('change', (e) => {
+    const card = e.target.closest('.ai-checkbox-card');
+    const ai = e.target.value;
+    
+    if (e.target.checked) {
+      card.classList.add('selected');
+      if (!STATE.selectedAIs.includes(ai)) {
+        STATE.selectedAIs.push(ai);
+      }
+    } else {
+      card.classList.remove('selected');
+      STATE.selectedAIs = STATE.selectedAIs.filter(a => a !== ai);
+    }
+  });
+});
+
+// === QUERY MANAGEMENT ===
+function setQuery(text) {
+  $('queryInput').value = text;
+  $('queryInput').focus();
+}
+
+// === API CALLS WITH ERROR HANDLING ===
+
+async function callGemini(prompt) {
+  const apiKey = STATE.apiKeys.gemini;
+  if (!apiKey) return { success: false, error: 'API Key Missing - Get from ai.google.dev' };
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        contents: [{ parts: [{ text: `${GGI.systemPrefix}\n\nUser query:\n${prompt}` }] }],
+        generationConfig: { temperature: GGI.temp }
+      })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return { success: true, response: data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response' };
+  } catch (error) { 
+    return { success: false, error: error.message }; 
+  }
+}
+
+async function callChatGPT(prompt) {
+  const apiKey = STATE.apiKeys.openai;
+  if (!apiKey) return { success: false, error: 'API Key Missing - Get from platform.openai.com' };
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({ 
+        model: "gpt-4o", 
+        messages: [
+          { role: "system", content: GGI.systemPrefix },
+          { role: "user", content: prompt }
+        ], 
+        temperature: GGI.temp 
+      })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return { success: true, response: data.choices?.[0]?.message?.content || 'No response' };
+  } catch (error) { 
+    if (error.message === 'Failed to fetch') {
+      return { success: false, error: 'CORS Error - Install a CORS browser extension or use a proxy' };
+    }
+    return { success: false, error: error.message }; 
+  }
+}
+
+async function callClaude(prompt) {
+  const apiKey = STATE.apiKeys.anthropic;
+  if (!apiKey) return { success: false, error: 'API Key Missing - Get from console.anthropic.com' };
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 
+        'x-api-key': apiKey, 
+        'anthropic-version': '2023-06-01', 
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true' 
+      },
+      body: JSON.stringify({ 
+        model: "claude-3-5-sonnet-20241022", 
+        max_tokens: 1024, 
+        temperature: GGI.temp,
+        system: GGI.systemPrefix,
+        messages: [{ role: "user", content: prompt }] 
+      })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return { success: true, response: data.content?.[0]?.text || 'No response' };
+  } catch (error) { 
+    return { success: false, error: error.message }; 
+  }
+}
+
+async function callGrok(prompt) {
+  const apiKey = STATE.apiKeys.xai;
+  if (!apiKey) return { success: false, error: 'API Key Missing - Get from console.x.ai' };
+  try {
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "grok-beta",
+        messages: [
+          { role: "system", content: `${GGI.systemPrefix} You are Grok, xAI's helpful assistant.` },
+          { role: "user", content: prompt }
+        ],
+        stream: false,
+        temperature: GGI.temp
+      })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return { success: true, response: data.choices?.[0]?.message?.content || 'No response' };
+  } catch (error) {
+    if (error.message === 'Failed to fetch') {
+      return { success: false, error: 'CORS Error - Install a CORS browser extension or use a proxy' };
+    }
+    return { success: false, error: error.message };
+  }
+}
+
+// === COMPARISON ENGINE ===
+async function runComparison() {
+  const query = $('queryInput').value.trim();
+  if (!query) { 
+    showToast('Please enter a query first!', 'warning');
+    return; 
+  }
+  if (STATE.selectedAIs.length === 0) { 
+    showToast('Please select at least one AI!', 'warning');
+    return; 
+  }
+
+  // Check if required API keys are present
+  const missingKeys = STATE.selectedAIs.filter(ai => {
+    if (ai === 'gemini') return !STATE.apiKeys.gemini;
+    if (ai === 'chatgpt') return !STATE.apiKeys.openai;
+    if (ai === 'claude') return !STATE.apiKeys.anthropic;
+    if (ai === 'grok') return !STATE.apiKeys.xai;
+    return false;
+  });
+
+  if (missingKeys.length > 0) {
+    showToast(`Missing API keys for: ${missingKeys.join(', ')}`, 'error');
+    return;
+  }
+
+  $('btnCompare').disabled = true;
+  $('btnCompare').textContent = '⏳ QUERYING AIs...';
+  
+  $('emptyState').style.display = 'none';
+  $('resultsContainer').style.display = 'block';
+  $('statsSection').style.display = 'block';
+  $('resultsGrid').innerHTML = '';
+  STATE.results = [];
+
+  const loadingCards = STATE.selectedAIs.map(ai => {
+    const card = document.createElement('div');
+    card.className = 'ai-response-card';
+    card.innerHTML = `
+      <div class="ai-response-header">
+        <div class="ai-name"><div class="ai-badge"></div>${ai.toUpperCase()}</div>
+      </div>
+      <div class="loading-indicator">
+        <div class="spinner"></div>
+        <div>Querying ${ai}...</div>
+      </div>`;
+    $('resultsGrid').appendChild(card);
+    return { ai, card };
+  });
+
+  const promises = STATE.selectedAIs.map(async (ai, index) => {
+    const start = Date.now();
+    let result;
+    try {
+      switch(ai) {
+        case 'gemini': result = await callGemini(query); break;
+        case 'chatgpt': result = await callChatGPT(query); break;
+        case 'claude': result = await callClaude(query); break;
+        case 'grok': result = await callGrok(query); break;
+        default: result = { success: false, error: 'Unknown AI' };
+      }
+    } catch (error) {
+      result = { success: false, error: error.message };
+    }
+    return {
+      ai, 
+      ...result, 
+      responseTime: ((Date.now() - start) / 1000).toFixed(2),
+      tokens: result.response ? Math.floor(result.response.length / 4) : 0
+    };
+  });
+
+  const results = await Promise.all(promises);
+  STATE.results = results;
+
+  results.forEach((result, index) => {
+    const card = loadingCards[index].card;
+    const statusEmoji = result.success ? '✅' : '❌';
+    card.innerHTML = `
+      <div class="ai-response-header">
+        <div class="ai-name"><div class="ai-badge" style="${!result.success ? 'background: #ef4444; box-shadow: 0 0 6px #ef4444;' : ''}"></div>${statusEmoji} ${result.ai.toUpperCase()}</div>
+        <div class="ai-response-time">${result.responseTime}s · T=${GGI.temp.toFixed(2)}</div>
+      </div>
+      <div class="ai-response-body">${result.success ? result.response : `❌ Error: ${result.error}`}</div>
+      ${result.success ? `<div class="ai-response-footer">
+        <button class="rating-btn" onclick="rateResponse(${index}, 'best')">👍 Best</button>
+        <button class="rating-btn" onclick="rateResponse(${index}, 'good')">✅ Good</button>
+        <button class="rating-btn" onclick="rateResponse(${index}, 'meh')">😐 Meh</button>
+      </div>` : ''}`;
+  });
+
+  const successfulResults = results.filter(r => r.success);
+  const avgTime = successfulResults.length > 0 
+    ? (successfulResults.reduce((sum, r) => sum + parseFloat(r.responseTime), 0) / successfulResults.length).toFixed(2)
+    : '0.0';
+  const totalTokens = results.reduce((sum, r) => sum + r.tokens, 0);
+  
+  $('statAIs').textContent = results.length;
+  $('statTime').textContent = avgTime + 's';
+  $('statTokens').textContent = '~' + totalTokens;
+  $('statWinner').textContent = '—';
+
+  $('btnCompare').disabled = false;
+  $('btnCompare').textContent = '🚀 COMPARE RESPONSES (GGI ACTIVE)';
+  
+  showToast(`Comparison complete! ${successfulResults.length}/${results.length} AIs responded.`, 'success');
+}
+
+function rateResponse(index, rating) {
+  STATE.results[index].rating = rating;
+  $$('.winner-badge').forEach(b => b.remove());
+  if (rating === 'best') {
+    const badge = document.createElement('div');
+    badge.className = 'winner-badge';
+    badge.textContent = '🏆 WINNER';
+    $$('.ai-response-card')[index].appendChild(badge);
+    $('statWinner').textContent = STATE.results[index].ai.toUpperCase();
+  }
+  const buttons = $$('.ai-response-card')[index].querySelectorAll('.rating-btn');
+  buttons.forEach(btn => btn.classList.remove('selected'));
+  const map = { best: 0, good: 1, meh: 2 };
+  buttons[map[rating]].classList.add('selected');
+}
+
+// === EXPORT FUNCTIONALITY ===
+function exportResults() {
+  if (STATE.results.length === 0) {
+    showToast('No results to export!', 'warning');
+    return;
+  }
+
+  const query = $('queryInput').value.trim();
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  
+  const exportData = {
+    query,
+    ggiMode: GGI.mode,
+    temperature: GGI.temp,
+    timestamp: new Date().toISOString(),
+    results: STATE.results.map(r => ({
+      ai: r.ai,
+      success: r.success,
+      response: r.response || r.error,
+      responseTime: r.responseTime,
+      tokens: r.tokens,
+      rating: r.rating || 'unrated'
+    }))
+  };
+
+  const markdown = `# GGI AI Comparison Results
+**Query:** ${query}
+**GGI Mode:** ${GGI.mode} (Temperature: ${GGI.temp})
+**Timestamp:** ${new Date().toLocaleString()}
+**AIs Compared:** ${STATE.results.length}
+
+---
+
+${STATE.results.map(r => `## ${r.ai.toUpperCase()} ${r.rating === 'best' ? '🏆' : ''}
+**Status:** ${r.success ? '✅ Success' : '❌ Failed'}
+**Response Time:** ${r.responseTime}s
+**Tokens:** ~${r.tokens}
+**Rating:** ${r.rating || 'Unrated'}
+
+### Response:
+${r.success ? r.response : `Error: ${r.error}`}
+
+---
+`).join('\n')}
+
+*Generated by GGI Comparison Mode*
+*© Media Content Delivery, LLC - Ovidiu Mircea Demetrian*
+`;
+
+  const blob = new Blob([markdown], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ggi-comparison-${timestamp}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showToast('Results exported successfully!', 'success');
+}
+
+$('btnCompare').addEventListener('click', runComparison);
+$('btnExport').addEventListener('click', exportResults);
+$('btnClear').addEventListener('click', () => {
+  $('queryInput').value = '';
+  $('resultsContainer').style.display = 'none';
+  $('statsSection').style.display = 'none';
+  $('emptyState').style.display = 'block';
+  STATE.results = [];
+  showToast('Results cleared', 'success');
+});
+
+// === KEYBOARD SHORTCUTS ===
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      runComparison();
+    } else if (e.key === 's') {
+      e.preventDefault();
+      exportResults();
+    }
+  }
+});
+
+// === BOOT SCREEN ANIMATION ===
+window.onload = () => {
+  let w = 0;
+  const bar = $('bootBar');
+  const int = setInterval(() => {
+    w += 20;
+    bar.style.width = w + "%";
+    if(w >= 100) {
+      clearInterval(int);
+      setTimeout(() => { 
+        $('bootScreen').style.opacity = 0; 
+        $('mainWrap').style.opacity = 1; 
+        setTimeout(() => $('bootScreen').style.display = 'none', 500); 
+      }, 500);
+    }
+  }, 150);
+};
+</script>
+</body>
+</html>
