@@ -5,7 +5,7 @@ Lumină, nu vrăjeală.
 
 `v34-3` · single file · no build step · no dependencies · no server · installable.
 
-**Live:** https://ovidemetrian.github.io/REPO-NAME/
+**Live:** https://ovidemetrian.github.io/GGI-GENIAL-GENUINE-INTELIGENCE/
 
 ---
 
