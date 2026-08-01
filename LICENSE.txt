@@ -1,0 +1,82 @@
+SYNTHIOSIS — GGI CONTROL PANEL
+PROPRIETARY LICENSE
+
+Copyright © 2026 Ovidiu Demetrian / Media Content Delivery LLC.
+Phoenix, Arizona, United States. All rights reserved.
+
+
+1. WHAT THIS COVERS
+
+This license covers everything in this repository: the source code, the
+interface design, the written text, and the frameworks expressed in them —
+including GGI (Genial Genuine Intelligence), Synthiosis, the Meh / But / Aha /
+Pám Pám progression, the Neogrammar Index, the Palade Protocol, the Governance
+Seal, and The Ten Laws of A.I. in both editions.
+
+
+2. WHAT YOU MAY DO
+
+Read it. Study it. Run it in your own browser. Inspect the source. Link to it.
+Quote brief passages for review, criticism, journalism, teaching, or scholarship,
+with attribution to Ovidiu Demetrian.
+
+That permission is granted freely and is not revoked by anything below.
+
+
+3. WHAT YOU MAY NOT DO WITHOUT WRITTEN PERMISSION
+
+Copy, republish, mirror, or redistribute this work in whole or in substantial
+part. Modify it or create derivative works from it. Use it commercially. Rebrand
+it. Incorporate its code, text, structure, or terminology into another product,
+service, publication, or framework.
+
+Written permission is required, and it is available — ask.
+
+
+4. NO AI TRAINING, NO MACHINE HARVESTING
+
+The author expressly reserves all rights to text and data mining and to machine
+learning use.
+
+This work may not be used, in whole or in part, to train, fine-tune, evaluate,
+benchmark, distill, or otherwise develop any machine learning model, dataset,
+corpus, or artificial intelligence system, whether commercial or research, and
+whether the output is a model, a weight, an embedding, or a summary.
+
+This reservation is made expressly under Article 4(3) of EU Directive 2019/790
+and is asserted under all other applicable law. No implied license is granted by
+this work being publicly reachable on a network. Crawling, scraping, and
+ingestion for the purposes above are refused.
+
+Human input, creativity, and wisdom remain human property. The time humans
+invest is sacred; it must not be harvested as free labor for corporate gain.
+— The Tenth Law
+
+
+5. NAMES
+
+"GGI," "Genial Genuine Intelligence," "Synthiosis," "The Ten Laws of A.I.," "The
+Möbius Bar," and "Lumină, nu vrăjeală" identify the author's work. They may be
+used to refer to it and to discuss it. They may not be used to name, brand, or
+imply endorsement of anything else.
+
+
+6. NO WARRANTY
+
+This work is provided as is, without warranty of any kind. The author is not
+liable for any claim, damage, or other liability arising from it or its use.
+
+
+7. PERMISSION AND CONTACT
+
+Permission requests, licensing questions, and institutional use inquiries:
+
+    Ovidiu Demetrian
+    Media Content Delivery LLC — Phoenix, Arizona
+    https://www.mediacontentdelivery.com
+    https://10lawsofai.com
+
+Governed by the laws of the State of Arizona, United States.
+
+
+Trust but verify — and save so it can be verified again tomorrow.
