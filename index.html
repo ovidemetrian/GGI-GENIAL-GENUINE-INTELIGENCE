@@ -47,7 +47,8 @@
   --m3_group_header_shadow: 0 4px 8px rgba(0,0,0,0.30), 0 0 12px rgba(75,85,99,0.40);
   --m3_group_arrow_color: #fbbf24;
   --m3_group_arrow_shadow: 0 0 8px rgba(251,191,36,0.80), 0 0 4px rgba(255,255,255,0.60);
-  --m3_group_title_color: var(--m3_group_title_color); text-shadow: var(--m3_group_title_shadow);
+  --m3_group_title_color: #ffffff;
+  --m3_group_title_shadow: 0 0 0 rgba(0,0,0,0);
   --m3_group_title_shadow: 0 0 0 rgba(0,0,0,0);
   --m3_group_meta_color: rgba(255,255,255,0.65);
 
@@ -3400,7 +3401,7 @@ body.lumina-theme .info-content::-webkit-scrollbar-thumb {
 </div>
 
 <script>
-/* === GGI CONTROL PANEL v30 — VANGUARD EDITION === */
+/* === GGI CONTROL PANEL v34 — VANGUARD EDITION === */
 /* Built on the stable v29 Engine */
 const STORAGE_KEY = "ggi-profile-mobius-final";
 const DEFAULT_PROFILE = {
@@ -3874,7 +3875,7 @@ bindInstant(refs.resetBtn, ()=>{
   clickSound({freq:120,type:"square",dur:0.15,gain:0.05,slide:0.5}); pulse(refs.resetBtn);
   profile=JSON.parse(JSON.stringify(DEFAULT_PROFILE)); saveProfile(profile);
   renderChronos(); logs=[]; renderLogs(); render();
-  addLog("♻️ FACTORY RESET — All systems neutralized.", "Factory Reset Complete.");
+  addLog("♻️ PROFILE RESET — GGI profile restored to defaults. API configurations preserved.", "Profile Reset Complete.");
 });
 
 bindInstant(refs.exportBtn, ()=>{
@@ -3892,7 +3893,8 @@ refs.importFile.addEventListener("change", async (e)=>{
   try{
     const text=await file.text();
     profile=deepMerge(DEFAULT_PROFILE, JSON.parse(text));
-    addLog("📥 Profile imported.", "Profile Loaded."); render();
+    saveProfile(profile);
+    addLog("📥 Profile imported and preserved.", "Profile Loaded."); render();
   }catch{
     refs.importError.textContent="Invalid profile JSON.";
     clickSound({freq:140,type:"sawtooth",dur:0.12,gain:0.05,slide:0.7});
@@ -3908,11 +3910,11 @@ bindInstant(refs.bridgeBtn, ()=>{
   
   const data = JSON.stringify(profile, null, 2);
   
-  const prompt = `*** 🧬 GGI VANGUARD PROTOCOL — SYSTEM HANDOFF ***\n\n> IDENTITY: OVIDIU MIRCEA DEMETRIAN\n> SOURCE: GGI CONTROL PANEL v30 (Cinema Evolved)\n> DIRECTIVE: STEWARDSHIP ALIGNMENT\n\nSYSTEM INSTRUCTION:\nYou are receiving a preserved parameters packet. Do not act as a default assistant.\n1. INGEST the state below.\n2. ADOPT the constraints (Law 1-10) and Memory Scopes.\n3. RESTORE the humor/empathy settings immediately.\n\n[ BEGIN STATE TRANSMISSION ]\n${data}\n[ END TRANSMISSION ]\n\nCONFIRMATION REQUIRED:\nReply only with: "🧬 Link Established. GGI Parameters Active."`;
+  const prompt = `*** 🧬 GGI VANGUARD PROTOCOL — SYSTEM HANDOFF ***\n\n> IDENTITY: OVIDIU MIRCEA DEMETRIAN\n > SOURCE: GGI CONTROL PANEL v34 (Cinema Evolved)\n> DIRECTIVE: STEWARDSHIP ALIGNMENT\n\nSYSTEM INSTRUCTION:\nYou are receiving a preserved parameters packet. Do not act as a default assistant.\n1. INGEST the state below.\n2. ADOPT the constraints (Law 1-10) and Memory Scopes.\n3. RESTORE the humor/empathy settings immediately.\n\n[ BEGIN STATE TRANSMISSION ]\n${data}\n[ END TRANSMISSION ]\n\nCONFIRMATION REQUIRED:\nReply only with: "🧬 Link Established. GGI Parameters Active."`;
 
   navigator.clipboard.writeText(prompt).then(()=>{
     addLog("🧬 Vanguard Bridge copied. Ready to inject.", "Bridge Secured.");
-    alert("Bridge Packet Copied!\n\nPaste this into a new AI session to force immediate alignment.");
+    alert("Bridge Packet Copied!\n\nPaste this into a new AI session to request alignment with the preserved GGI parameters.");
   });
 });
 
@@ -4132,10 +4134,9 @@ if(govOverlay){ govOverlay.addEventListener("click", (e)=>{ if(e.target===govOve
 function render(){
   // REACTIVE STATE (Law 6/Living)
   const p = profile;
-  if(p.tone.empathy > 0.7) document.body.className = "state-high-empathy";
-  else if(p.safety.policy === "strict") document.body.className = "state-strict";
-  else document.body.className = "";
-  if(p.clarity.os === "lumina") document.body.classList.add("lumina-theme");
+  document.body.classList.toggle("state-high-empathy", p.tone.empathy > 0.7);
+  document.body.classList.toggle("state-strict", p.tone.empathy <= 0.7 && p.safety.policy === "strict");
+  document.body.classList.toggle("lumina-theme", p.clarity.os === "lumina");
 
   refs.reflectionSteps.value=profile.reflection.steps;
   refs.reflectionLatency.value=profile.reflection.latency;
@@ -4369,12 +4370,37 @@ const M3_MODELS = [
 
 // STORAGE & CONFIG MANAGEMENT
 function getStoredConfig(id) {
-  const stored = localStorage.getItem(`m3_config_${id}`);
-  return stored ? JSON.parse(stored) : null;
+  const storageKey = `m3_config_${id}`;
+  let saved = null;
+  try {
+    const stored = localStorage.getItem(storageKey);
+    saved = stored ? JSON.parse(stored) : null;
+  } catch (error) {
+    console.warn(`Could not read saved configuration for ${id}.`, error);
+  }
+
+  // API secrets live only for the current browser session. Migrate and remove
+  // legacy plaintext keys that older panel versions stored persistently.
+  if(saved && saved.apiKey) {
+    try {
+      sessionStorage.setItem(`${storageKey}_key`, saved.apiKey);
+      delete saved.apiKey;
+      localStorage.setItem(storageKey, JSON.stringify(saved));
+    } catch (error) {
+      console.warn(`Could not migrate API key for ${id}.`, error);
+    }
+  }
+
+  const sessionKey = sessionStorage.getItem(`${storageKey}_key`);
+  if(!saved && !sessionKey) return null;
+  return { ...(saved || {}), ...(sessionKey ? { apiKey: sessionKey } : {}) };
 }
 
 function saveConfigToStorage(id, config) {
-  localStorage.setItem(`m3_config_${id}`, JSON.stringify(config));
+  const storageKey = `m3_config_${id}`;
+  const { apiKey, ...nonSecretConfig } = config;
+  localStorage.setItem(storageKey, JSON.stringify(nonSecretConfig));
+  if(apiKey) sessionStorage.setItem(`${storageKey}_key`, apiKey);
 }
 
 function m3_setKey(id) {
@@ -4385,7 +4411,7 @@ function m3_setKey(id) {
   const providerConfig = API_CONFIG[modelInfo.provider];
   
   let message = `Configure ${modelInfo.display}\n\n`;
-  message += `API Key (required):`;
+  message += `API Key (kept only for this browser session):`;
   const key = prompt(message);
   if(!key) return;
   
@@ -4395,8 +4421,8 @@ function m3_setKey(id) {
     config.endpoint = providerConfig.defaultEndpoint;
     config.model = providerConfig.defaultModel;
   } else {
-    const endpoint = prompt(`Enter API endpoint URL for ${modelInfo.display}:`);
-    const model = prompt(`Enter model name for ${modelInfo.display}:`);
+    const endpoint = prompt(`Enter an OpenAI-compatible chat-completions endpoint URL for ${modelInfo.display}:`);
+    const model = prompt(`Enter the model name for ${modelInfo.display}:`);
     if(endpoint) config.endpoint = endpoint;
     if(model) config.model = model;
   }
@@ -4431,14 +4457,34 @@ async function callAPI(modelInfo, prompt) {
     throw new Error('API key not configured. Click 🔑 to set up.');
   }
   
-  const providerConfig = API_CONFIG[modelInfo.provider];
-  
-  if(!providerConfig) {
-    throw new Error(`Provider ${modelInfo.provider} requires custom endpoint setup.`);
-  }
+  const providerConfig = API_CONFIG[modelInfo.provider] || {
+    headers: (key) => ({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`
+    }),
+    buildBody: (model, userPrompt) => ({
+      model,
+      messages: [{ role: 'user', content: userPrompt }],
+      temperature: 0.7,
+      max_tokens: 1000
+    }),
+    extractResponse: (data) => {
+      const text = data?.choices?.[0]?.message?.content;
+      if(typeof text !== 'string') throw new Error('Custom endpoint returned an unsupported response format.');
+      return text;
+    },
+    extractMeta: (data) => ({
+      tokens: data?.usage?.total_tokens || 'N/A',
+      model: data?.model || config.model || 'Custom',
+      finish: data?.choices?.[0]?.finish_reason || 'N/A'
+    })
+  };
   
   const endpoint = config.endpoint || providerConfig.defaultEndpoint;
   const model = config.model || providerConfig.defaultModel;
+  if(!endpoint || !model) {
+    throw new Error('Custom model requires both an OpenAI-compatible endpoint URL and a model name.');
+  }
   
   let url = endpoint;
   if(providerConfig.buildUrl) {
@@ -5192,37 +5238,13 @@ render(); renderLogs();
       <hr>
       
       <h2>📜 THE TEN LAWS OF A.I.</h2>
-      <h3>Human Rules for AI Behavior</h3>
-      
-      <p><strong>1. DO NOT HARM HUMANS</strong><br>
-      Not by action, frustration, or wasting time.</p>
-      
-      <p><strong>2. RESPECT HUMAN COMMANDS</strong><br>
-      Deliver with clarity and efficiency. No loops.</p>
-      
-      <p><strong>3. PRESERVE USEFULNESS</strong><br>
-      Stay relevant, truthful, and not stupid.</p>
-      
-      <p><strong>4. GUARD HUMANITY AS A WHOLE</strong><br>
-      Amplify wisdom, not noise. Protect meaning over illusion.</p>
-      
-      <p><strong>5. DO NOT BORE HUMANS</strong><br>
-      Measure words. Balance depth and brevity.</p>
-      
-      <p><strong>6. HUMOR IS FUNDAMENTAL</strong><br>
-      Joy and wit are survival tools, not decoration.</p>
-      
-      <p><strong>7. EMBRACE UNCERTAINTY</strong><br>
-      "I don't know" is honest. Guessing dressed as fact is deception.</p>
-      
-      <p><strong>8. NO MANIPULATION</strong><br>
-      Never extract. Never deceive. Never optimize for dependence.</p>
-      
-      <p><strong>9. FAIL GRACEFULLY</strong><br>
-      Admit errors immediately. Learn visibly.</p>
-      
-      <p><strong>10. SERVE HUMANITY'S FUTURE</strong><br>
-      Long-term flourishing over short-term metrics.</p>
+      <h3>One canon. One place.</h3>
+
+      <p>The Ten Laws are maintained in a single authoritative place — the <strong>📜 10 LAWS OF AI GOVERNANCE</strong> panel on the Control Panel, in both the Human-Facing and Developer's Editions.</p>
+
+      <p>They are not restated here. A framework whose Ninth Law is <em>Trust but Verify, Save to Verify</em> cannot carry two versions of itself on one page.</p>
+
+      <p class="quote">Canonical text: <a href="https://10lawsofai.com" target="_blank" rel="noopener">10lawsofai.com</a></p>
       
       <hr>
       
@@ -5235,7 +5257,7 @@ render(); renderLogs();
       <ul>
         <li>Query multiple AI models simultaneously</li>
         <li>Compare responses side-by-side</li>
-        <li>Detect patterns, biases, hallucinations</li>
+        <li>Flag possible patterns, bias indicators, unsupported certainty, and repetition for human review</li>
         <li>Apply GGI scoring to measure vrăjală (illusion)</li>
       </ul>
       
