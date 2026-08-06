@@ -1,82 +1,128 @@
-# GGI Control Panel — SYNTHIOSIS
+# GGI — Genial Genuine Intelligence
 
-**Genial Genuine Intelligence — the steering wheel for AGI.**  
-*Lumină, nu vrăjeală. (Light, not deception.)*
+«“Machine got speed. Human got time.”»
 
-Single-file PWA · No build step · No dependencies · Installable & offline-capable
+«GGI is an independent research, governance, and engineering initiative created by Ovidiu “Ovi” Demetrian. It explores how human judgment, meaning, responsibility, and creativity can remain sovereign while working with increasingly capable artificial intelligence.»
 
-**🔗 Live:** https://ovidemetrian.github.io/GGI-GENIAL-GENUINE-INTELLIGENCE/
+This repository contains the working GGI Control Panel and serves as an entry point into the wider GGI ecosystem.
 
----
+Introduction and quick overview
+- This repo: the working GGI Control Panel — a single-file Progressive Web App (PWA) designed for offline use, with no build step and no external dependencies.
+- Focus: human‑first governance and practical engineering supporting human–AI collaboration.
+- Governance artifacts present in this repository: Canon Rule, Ten Laws of AI, Palade Precedent, and the Five Thresholds of AI Risk.
+- Technical features present in the Control Panel: API-key handling and governance metadata surfaced in the UI.
 
-## What It Is
+The GGI Ecosystem
+«GGI is part of an interconnected body of work exploring human cognition, artificial intelligence, governance, language, engineering, narrative, and practical technology.»
 
-The Control Panel is the working instrument of the **GGI framework**: a governance system for artificial general intelligence built on the principle that humans provide Intent and Conscience, while machines provide Compute and Scale.
+Core Ideas and Governance
+- GGI — Genial Genuine Intelligence  
+  The human-centered intelligence and governance framework represented by this repository.  
+  [GGI — Genial Genuine Intelligence](https://ovidemetrian.github.io/GGI-GENIAL-GENUINE-INTELLIGENCE/)
 
-Bundled in one file:
-- **Synthiosis Info shelf** — Direction, not drift
-- **Palade Precedent** — AI ethics framework
-- **Five Thresholds of AI Risk** — Risk assessment gates
-- **Governance Seal** — The Ten Laws of AI (canonical single source of truth)
-- **API key management** — Secure session-only storage
+- Ten Laws of AI  
+  The canonical governance principles supporting GGI and responsible human–AI collaboration.  
+  [Ten Laws of AI](https://10lawsofai.com)
 
-### v34-4 Features
-✅ Offline-first service worker (network-first, cache fallback)  
-✅ Progressive Web App (installable on Android & iOS)  
-✅ API keys in `sessionStorage` only (never persisted to disk)  
-✅ Custom AI endpoint support (OpenAI-compatible)  
-✅ Accessibility-first (`prefers-reduced-motion` honored)  
-✅ Zero dependencies · Zero trackers · Zero servers needed
+- Möbius Bar  
+  The narrative and philosophical environment where GGI, Synthiosis, Neogrammar, human cognition, humor, paradox, and AI behavior are explored.  
+  [Möbius Bar](https://ovidemetrian.github.io/mobiusbar/)
 
----
+Engineering and Professional Practice
+- Media Content Delivery  
+  Professional work in audio, video, networking, smart environments, automation, and integrated media systems.  
+  [Media Content Delivery](https://www.mediacontentdelivery.com/)
 
-## How to Use
+- Smart Homes by Ovi  
+  Practical smart-home technology, automation, networking, audio, security, and intelligent-environment integration.  
+  [Smart Homes by Ovi](https://smarthomesbyovi.com/)
 
-1. **Open** https://ovidemetrian.github.io/GGI-GENIAL-GENUINE-INTELLIGENCE/
-2. **Add to home screen** (Android: Chrome menu → "Add to Home screen" | iOS: Share → "Add to Home Screen")
-3. **Paste your API key** (ChatGPT, Claude, or custom endpoint)
-4. **Configure model parameters** (persisted in `localStorage`, non-sensitive)
-5. **Works offline** — all settings and history available without network
+Additional Projects
+- NoEscape  
+  An experimental project examining interfaces, digital persuasion, navigation, attention, and human awareness.  
+  [NoEscape (Netscape)](https://ovidemetrian.github.io/Netscape/)
 
----
+- My Future Past  
+  An interactive multimedia résumé and professional story connecting music, engineering, smart environments, AI, and personal experience.  
+  [My Future Past](https://ovidemetrian.github.io/my-future-past/)
 
-## The Canon Rule
+Neogrammar
+Neogrammar is an evolving language and conceptual framework for human–AI communication. It supplies terms and conceptual structures for ideas conventional vocabulary does not capture. Representative Neogrammar terms used across the work include:
+- Future Past
+- Vrăjală
+- Meh → But → Aha → Pam‑Pam
+- Nose on the Glass
+- Loopdrift
 
-**The Ten Laws of AI exist in exactly one place:** the `📜 10 LAWS OF AI GOVERNANCE` modal. This is the authoritative source.
+Conceptual architecture
+- GGI is the framework.
+- Synthiosis is the human↔machine relationship and practice.
+- Neogrammar is the language.
+- The Ten Laws of AI are the governance.
+- Möbius Bar is the narrative environment.
+- Media Content Delivery and Smart Homes by Ovi provide the practical engineering foundation.
+- NoEscape and My Future Past are applied and creative expressions of the work.
 
-Do not duplicate the Laws elsewhere in the code. A framework whose Ninth Law is *Trust but Verify* cannot ship two versions of itself on one page.
+Identity diagram
+```text
+GGI
+        Genial Genuine Intelligence
+                    │
+      ┌─────────────┼─────────────┐
+      │             │             │
+ Synthiosis    Neogrammar   Ten Laws
+      │             │             │
+      └─────────────┼─────────────┘
+                    │
+              Möbius Bar
+                    │
+      ┌─────────────┼─────────────┐
+      │                           │
+ Media Content            Smart Homes
+   Delivery                  by Ovi
+                    │
+              Real Applications
+```
 
----
+What exists now (transparency)
+- Files and artifacts observed in this repository:
+  - `index.html` — the primary single-file PWA interface (SYNTHIOSIS / GGI Control Panel).
+  - `GGI_Control_Panel_v30_VANGUARD_cognition_gauge_MEMORY_SPLIT_v7_speedometer.html` — single-file Control Panel variant.
+  - `manifest.json` and `sw.js` — PWA manifest and service worker for offline capability.
+  - `icon-512.png`, `apple-touch-icon.png` — icons used by the PWA.
+  - `README.md` (this file) and `LICENSE.txt`.
+- Confirmed technical properties (present in repository files):
+  - Single-file PWA UI(s) provided as HTML files.
+  - PWA manifest and service worker implementing offline caching behavior.
+  - No explicit build toolchain visible in repository root.
+  - Governance artifacts surfaced in the UI: Ten Laws (embedded), Canon Rule and Palade Precedent are referenced in the control panel text and UI.
+  - API‑endpoint support and UI controls exist for configuring custom AI endpoints (OpenAI‑compatible support is shown in the UI text).
+  - Storage patterns: the UI code shows usage of `localStorage` for profile persistence; the repository’s README also references `sessionStorage` for keys (see verification notes below).
+- Experimental material observed inline in the Control Panel UI (embedded narratives, Möbius Bar references, Neogrammar terms).
 
-## Technical Details
+Planned documentation (not created here)
+- The following documentation files are listed here only as planned unless they already exist in the repository:
+  - `docs/PHILOSOPHY.md`
+  - `docs/NEOGRAMMAR.md`
+  - `docs/SYNTHIOSIS.md`
+  - `docs/GOVERNANCE.md`
+  - `docs/TEN-LAWS.md`
 
-- **Language:** HTML5 + CSS3 + Vanilla JavaScript
-- **Storage:** `sessionStorage` (keys), `localStorage` (config only)
-- **PWA:** `manifest.json` + `sw.js` (service worker)
-- **API:** Custom endpoints + OpenAI-compatible fallback
-- **Offline:** Full functionality without network (after first load)
-- **Icons:** Maskable icon for home screen, iOS touch icon
+How to use the Control Panel (brief)
+- Open the repository’s GitHub Pages link or open `index.html` (or the single-file Control Panel HTML) in a modern browser.
+- No build step required; the PWA is installable and provides offline behavior via the included `sw.js`.
+- API keys and endpoint configuration are entered via the Control Panel UI.
 
----
+Contributing and governance
+- The project’s governance artifacts (Ten Laws, Canon Rule, Palade Precedent, Five Thresholds) are primary touchstones for design and contributions.
+- See `LICENSE.txt` for licensing and reuse terms.
 
-## Governance & Submissions
+Connect
+- GitHub: [ovidemetrian](https://github.com/ovidemetrian)
+- Möbius Bar on YouTube: [@mobiusbar](https://youtube.com/@mobiusbar)
 
-- **NIST Submission:** 2026-01-21 (Framework & AI Governance)
-- **CDAO / Tradewinds:** 2026-02-26 (Institutional review)
-- **Licensed:** Proprietary (all rights reserved) | Code available for study and use with permission
+License
+See `LICENSE.txt` in the repository root.
 
----
-
-## Also See
-
-- **Ten Laws of AI (Full Text)** → https://10lawsofai.com
-- **Möbius Bar Desk** (News verification with three checking agents) → https://ovidemetrian.github.io/mobiusbar/
-- **My Future Past** (Audio-player résumé) → https://ovidemetrian.github.io/my-future-past/
-- **NoEscape Navigator** (Dark pattern museum) → https://ovidemetrian.github.io/Netscape/
-
----
-
-**Built by Ovidiu "Ovi" Demetrian**  
-Media Content Delivery LLC · Phoenix, Arizona
-
-> "The Human provides Intent and Conscience. The Machine provides Compute and Scale."
+Short closing
+GGI is a platform of interrelated projects spanning governance, language, narrative, and engineering grounded in practical professional experience. This repository hosts the working Control Panel — the operational lobby for the platform. Explore the Control Panel UI and the governance artifacts embedded within it.
