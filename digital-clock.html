@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Digital Clock — Multiple Time Zones</title>
+  <style>
+    body{font-family: Inter,Segoe UI,Roboto,Arial;display:flex;flex-direction:column;align-items:center;gap:18px;padding:28px;background:#0f1724;color:#e6eef8}
+    h1{font-size:20px;margin:0}
+    .clock-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;width:100%;max-width:980px}
+    .tz{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);padding:14px;border-radius:10px;box-shadow:0 4px 12px rgba(2,6,23,0.6)}
+    .label{font-size:13px;color:#9fb0cc}
+    .time{font-size:26px;font-weight:600;margin-top:6px}
+    .date{font-size:12px;color:#c7d7ea;margin-top:6px}
+    footer{font-size:13px;color:#9fb0cc;margin-top:10px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    input,select,button{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+    .small{font-size:12px}
+  </style>
+</head>
+<body>
+  <h1>Digital Clock — Multiple Time Zones</h1>
+  <div class="controls">
+    <label class="small">Add time zone:</label>
+    <select id="tz-select">
+      <option value="UTC">UTC</option>
+      <option value="Europe/London">Europe/London</option>
+      <option value="Europe/Paris">Europe/Paris</option>
+      <option value="America/New_York">America/New_York</option>
+      <option value="America/Los_Angeles">America/Los_Angeles</option>
+      <option value="Asia/Tokyo">Asia/Tokyo</option>
+      <option value="Asia/Shanghai">Asia/Shanghai</option>
+      <option value="Asia/Kolkata">Asia/Kolkata</option>
+      <option value="Australia/Sydney">Australia/Sydney</option>
+      <option value="Pacific/Auckland">Pacific/Auckland</option>
+    </select>
+    <button id="add-btn">Add</button>
+    <button id="reset-btn">Reset to defaults</button>
+  </div>
+
+  <div class="clock-grid" id="clocks"></div>
+
+  <footer>
+    Times use the browser's clock and Intl API. Add zones from the selector or type an IANA zone (e.g., "America/Chicago") in the console: addZone('America/Chicago')
+  </footer>
+
+  <script>
+    const defaultZones = ['UTC','America/New_York','Europe/London','Europe/Paris','Asia/Tokyo','Australia/Sydney'];
+    const container = document.getElementById('clocks');
+    const select = document.getElementById('tz-select');
+    const addBtn = document.getElementById('add-btn');
+    const resetBtn = document.getElementById('reset-btn');
+
+    function createCard(zone){
+      const card = document.createElement('div');
+      card.className = 'tz';
+      card.dataset.zone = zone;
+
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = zone;
+
+      const time = document.createElement('div');
+      time.className = 'time';
+      time.textContent = '--:--:--';
+
+      const date = document.createElement('div');
+      date.className = 'date';
+      date.textContent = '';
+
+      const rm = document.createElement('button');
+      rm.textContent = 'Remove';
+      rm.className = 'small';
+      rm.style.marginTop='8px';
+      rm.onclick = ()=>{ container.removeChild(card); saveZones(); };
+
+      card.appendChild(label);
+      card.appendChild(time);
+      card.appendChild(date);
+      card.appendChild(rm);
+      return card;
+    }
+
+    function renderZones(zones){
+      container.innerHTML='';
+      for(const z of zones){
+        try{
+          // Validate by creating formatter
+          new Intl.DateTimeFormat([], {timeZone: z});
+          container.appendChild(createCard(z));
+        }catch(e){
+          console.warn('Invalid time zone skipped:', z);
+        }
+      }
+    }
+
+    function update(){
+      const cards = container.querySelectorAll('.tz');
+      const now = new Date();
+      cards.forEach(card => {
+        const z = card.dataset.zone;
+        try{
+          const time = new Intl.DateTimeFormat([], {hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,timeZone:z});
+          const datef = new Intl.DateTimeFormat([], {weekday:'short',year:'numeric',month:'short',day:'2-digit',timeZone:z});
+          card.querySelector('.time').textContent = time.format(now);
+          card.querySelector('.date').textContent = datef.format(now);
+        }catch(e){
+          card.querySelector('.time').textContent = 'Invalid TZ';
+          card.querySelector('.date').textContent = '';
+        }
+      });
+    }
+
+    function loadZones(){
+      const raw = localStorage.getItem('clock_zones');
+      if(!raw) return defaultZones.slice();
+      try{ const parsed = JSON.parse(raw); return Array.isArray(parsed) && parsed.length?parsed:defaultZones.slice(); }catch(e){ return defaultZones.slice(); }
+    }
+
+    function saveZones(){
+      const zones = Array.from(container.querySelectorAll('.tz')).map(c=>c.dataset.zone);
+      localStorage.setItem('clock_zones', JSON.stringify(zones));
+    }
+
+    function addZone(zone){
+      if(!zone) return;
+      // avoid duplicates
+      const exists = Array.from(container.querySelectorAll('.tz')).some(c=>c.dataset.zone===zone);
+      if(exists) return;
+      try{
+        new Intl.DateTimeFormat([], {timeZone: zone});
+      }catch(e){ alert('Invalid IANA time zone: ' + zone); return; }
+      container.appendChild(createCard(zone));
+      saveZones();
+      update();
+    }
+
+    window.addZone = addZone; // show in console
+
+    addBtn.onclick = ()=>{ addZone(select.value); };
+    resetBtn.onclick = ()=>{ localStorage.removeItem('clock_zones'); renderZones(defaultZones); saveZones(); };
+
+    // init
+    const zones = loadZones();
+    renderZones(zones);
+    update();
+    setInterval(update, 1000);
+
+  </script>
+</body>
+</html>
