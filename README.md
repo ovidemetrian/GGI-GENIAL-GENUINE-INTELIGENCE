@@ -5,7 +5,7 @@
 
 Single-file PWA · No build step · No dependencies · Installable & offline-capable
 
-**🔗 Live:** https://ovidemetrian.github.io/GGI-GENIAL-GENUINE-INTELIGENCE/
+**🔗 Live:** https://ovidemetrian.github.io/GGI-GENIAL-GENUINE-INTELLIGENCE/
 
 ---
 
@@ -32,7 +32,7 @@ Bundled in one file:
 
 ## How to Use
 
-1. **Open** https://ovidemetrian.github.io/GGI-GENIAL-GENUINE-INTELIGENCE/
+1. **Open** https://ovidemetrian.github.io/GGI-GENIAL-GENUINE-INTELLIGENCE/
 2. **Add to home screen** (Android: Chrome menu → "Add to Home screen" | iOS: Share → "Add to Home Screen")
 3. **Paste your API key** (ChatGPT, Claude, or custom endpoint)
 4. **Configure model parameters** (persisted in `localStorage`, non-sensitive)
